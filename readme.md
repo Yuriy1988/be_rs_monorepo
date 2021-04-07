@@ -20,3 +20,10 @@ Main error scenarious are handled by API ("Product not found" error, try catch b
 
 I think everything is done but swagger. 
 If I have time for it then will add swagger later in couple of days.
+
+interface Product {
+    id: string,
+    title: string,
+    description: string,
+    price: number,
+}
