@@ -4,6 +4,7 @@ import { Response } from '../interfaces';
 
 export const getProducts = async ():Promise<Response> => {
   const productService = new ProductService();
+  console.log('getProducts');
 
   try {
     const products = await productService.getProducts();
@@ -15,10 +16,9 @@ export const getProducts = async ():Promise<Response> => {
     };
   } catch (error) {
     return {
-      statusCode: 400,
+      statusCode: 500,
       body: JSON.stringify(error),
       headers: HEADERS,
     };
   }
-
 };

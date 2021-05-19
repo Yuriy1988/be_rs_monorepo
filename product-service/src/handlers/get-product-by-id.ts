@@ -1,11 +1,21 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import ProductService from '../services/product-service';
 import { Response } from '../interfaces';
-import { HEADERS, ERROR_OBJECT } from '../shared/constants';
+import { HEADERS, ERROR } from '../shared/constants';
 
 export const getProductById = async (event: APIGatewayProxyEvent): Promise<Response> => {
   try {
     const productService = new ProductService();
+    console.log('getProductById', event.pathParameters.productId);
+
+    if (!event.pathParameters.productId) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify(ERROR.BAD_REQUEST),
+        headers: HEADERS,
+      };
+    }
+
     const product = await productService.getProduct(event.pathParameters.productId);
 
     if (product) {
@@ -18,12 +28,14 @@ export const getProductById = async (event: APIGatewayProxyEvent): Promise<Respo
 
     return {
       statusCode: 404,
-      body: JSON.stringify(ERROR_OBJECT),
+      body: JSON.stringify(ERROR.NOT_EXIST),
       headers: HEADERS,
     };
-  } catch (error) {
+  } catch(error) {
+    console.log(error);
+
     return {
-      statusCode: 400,
+      statusCode: 500,
       body: JSON.stringify(error),
       headers: HEADERS,
     };
