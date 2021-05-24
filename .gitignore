@@ -21,7 +21,7 @@ build/
 
 # Optional npm cache directory
 .npm
-
+.webpack
 .env
 
 # Optional eslint cache
@@ -31,3 +31,4 @@ build/
 .DS_Store
 
 **/.serverless
+**/build
