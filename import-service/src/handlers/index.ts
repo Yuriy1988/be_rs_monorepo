@@ -1,7 +1,7 @@
 import { pathResolver } from '../shared/utils';
 
-export default {
-  handler: `${pathResolver(__dirname)}/import-products-file.ts`,
+export const importProductsFile = {
+  handler: `${pathResolver(__dirname)}/import-products-file.importProductsFile`,
   events: [
     {
       http: {
@@ -18,4 +18,23 @@ export default {
       }
     }
   ]
+};
+
+export const importFileParser = {
+  handler: `${pathResolver(__dirname)}/import-file-parser.importFileParser`,
+  events: [
+    {
+      s3: {
+        bucket: 'products-storage',
+        event: 's3:ObjectCreated:*',
+        rules: [
+          {
+            prefix: 'uploaded/',
+            suffix: '.csv'
+          }
+        ],
+        existing: true
+      },
+    },
+  ],
 };

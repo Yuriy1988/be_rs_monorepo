@@ -1,47 +1,39 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import S3 from 'aws-sdk/clients/s3';
-import { HEADERS } from '../shared/constants';
-
-const bucketName = 'products-storage';
+import { S3 } from 'aws-sdk';
+import { HEADERS, ERROR } from '../shared/constants';
 
 export const importProductsFile = async (event: APIGatewayProxyEvent):Promise<any> => {
+  const name = event.queryStringParameters?.name;
+
   try {
-    if (!event.queryStringParameters || !event.queryStringParameters.name) {
+    if (!name) {
       return {
         statusCode: 400,
-        body: JSON.stringify({
-          message: "validation error",
-        }, null, 2),
+        body: JSON.stringify(ERROR.BAD_REQUEST),
         headers: HEADERS,
       };
     }
 
-    const { name } = event.queryStringParameters;
-
-    const s3 = new S3({ region: 'eu-west-1' });
-
+    const s3 = new S3({ region: process.env.REGION });
     const signedUrl = await s3.getSignedUrlPromise('putObject',  {
-      Bucket: bucketName,
-      Key: `uploaded/${name}`,
+      Bucket: process.env.BUCKET_NAME,
+      Key: `${process.env.BUCKET_UPLOADED_FOLDER_NAME}/${name}`,
+      ContentType: 'text/csv',
       Expires: 60,
-      ContentType: "text/csv"
     });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        signedUrl,
-      }, null, 2),
-      headers: Headers,
+      body: JSON.stringify(signedUrl),
+      headers: HEADERS,
     };
   } catch(error) {
     console.log(error);
+
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        message: "Server error!",
-      }, null, 2),
-      headers: Headers,
+      body: JSON.stringify(error),
+      headers: HEADERS,
     };
   }
 };
